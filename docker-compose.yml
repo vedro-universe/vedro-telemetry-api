@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15.1-alpine
+    environment:
+      - TZ=UTC
+      - POSTGRES_USER=vedro_telemetry
+      - POSTGRES_PASSWORD=vedro_telemetry
+      - POSTGRES_DB=vedro_telemetry
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "6432:5432"
+    healthcheck:
+      test: "pg_isready -U vedro_telemetry"
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  migrations:
+    image: gomicro/goose:3.7.0
+    command: goose postgres up
+    environment:
+      - GOOSE_DBSTRING=postgresql://vedro_telemetry:vedro_telemetry@db:5432/vedro_telemetry
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      db:
+        condition: service_healthy
