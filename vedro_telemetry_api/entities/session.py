@@ -16,6 +16,7 @@ class Environment(TypedDict):
     python_version: str
     vedro_version: str
 
+
 _utc_zero = datetime.utcfromtimestamp(0)
 
 
