@@ -88,8 +88,8 @@ class SessionRepository(Repository):
     def _make_plugins_query(self, session_id: UUID,
                             plugins: List[PluginEntity]) -> QueryType[List[Any]]:
         query = """
-            INSERT INTO plugins (session_id, name, module, enabled)
-             VALUES ($1, $2, $3, $4)
+            INSERT INTO plugins (session_id, name, module, enabled, version)
+             VALUES ($1, $2, $3, $4, $5)
         """
         args = []
         for plugin in plugins:
@@ -97,7 +97,8 @@ class SessionRepository(Repository):
                 session_id,
                 cut_str(plugin.name, 255),
                 cut_str(plugin.module, 1024),
-                plugin.enabled
+                plugin.enabled,
+                cut_str(plugin.version, 32),
             ])
         return query, args
 

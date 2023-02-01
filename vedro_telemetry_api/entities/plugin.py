@@ -8,3 +8,4 @@ class PluginEntity:
     name: str
     module: str
     enabled: bool
+    version: str

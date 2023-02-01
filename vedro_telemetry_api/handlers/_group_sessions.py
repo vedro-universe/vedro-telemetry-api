@@ -35,7 +35,12 @@ def _group_sessions(events: List[Dict[str, Any]]) -> Dict[UUID, SessionInfoEntit
             session.created_at = _ms_to_datetime(event["created_at"])
             for plugin in event["plugins"]:
                 sessions[session_id].plugins.append(
-                    PluginEntity(plugin["name"], plugin["module"], plugin["enabled"])
+                    PluginEntity(
+                        name=plugin["name"],
+                        module=plugin["module"],
+                        enabled=plugin["enabled"],
+                        version=plugin["version"],
+                    )
                 )
 
         elif event_id == "ArgParseTelemetryEvent":

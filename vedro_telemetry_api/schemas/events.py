@@ -17,6 +17,7 @@ PluginSchema = schema.dict({
     "name": schema.str.len(1, ...),
     "module": schema.str.len(1, ...),
     "enabled": schema.bool,
+    "version": schema.str.len(1, ...),
 })
 
 StartedTelemetryEvent = BaseEvent + schema.dict({
