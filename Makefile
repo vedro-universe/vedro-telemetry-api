@@ -8,7 +8,7 @@ install:
 
 .PHONY: dev
 dev:
-	HOST=localhost PORT=8080 DB_DSN=${DB_DSN} \
+	HOST=localhost TZ=UTC PORT=8080 DB_DSN=${DB_DSN} \
  		python3 -m vedro_telemetry_api
 
 .PHONY: test
