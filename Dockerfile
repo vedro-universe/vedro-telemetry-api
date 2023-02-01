@@ -11,5 +11,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 RUN apk del build-base gcc musl-dev libffi-dev
 
 COPY vedro_telemetry_api/ vedro_telemetry_api/
+COPY migrations/ migrations/
 
 CMD ["python3", "-m", "vedro_telemetry_api"]
