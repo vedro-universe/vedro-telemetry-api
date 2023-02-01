@@ -36,3 +36,11 @@ lint: check-types check-style check-imports
 
 .PHONY: all
 all: install lint test
+
+.PHONY: migrate
+migrate:
+	@GOOSE_DBSTRING=${DB_DSN} goose -dir ./migrations postgres up
+
+.PHONY: rollback
+rollback:
+	@GOOSE_DBSTRING=${DB_DSN} goose -dir ./migrations postgres down
