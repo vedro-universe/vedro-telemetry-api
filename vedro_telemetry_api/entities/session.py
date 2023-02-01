@@ -12,10 +12,16 @@ class InterruptedException(TypedDict):
     traceback: str
 
 
+_utc_zero = datetime.utcfromtimestamp(0)
+
+
 @dataclass
 class SessionEntity:
     id: UUID
-    started_at: datetime
+    inited_at: datetime = _utc_zero
+    created_at: datetime = _utc_zero
+
+    started_at: Optional[datetime] = None
     ended_at: Optional[datetime] = None
     project_id: str = ""
     cmd: Optional[List[str]] = None

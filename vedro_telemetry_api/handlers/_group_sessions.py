@@ -23,16 +23,16 @@ def _group_sessions(events: List[Dict[str, Any]]) -> Dict[UUID, SessionInfoEntit
     for event in events:
         event_id = event["event_id"]
         session_id = UUID(event["session_id"])
-        created_at = _ms_to_datetime(event["created_at"])
         if session_id not in sessions:
-            session = SessionEntity(session_id, created_at)
+            session = SessionEntity(session_id)
             sessions[session_id] = SessionInfoEntity(session)
         else:
             session = sessions[session_id].session
 
         if event_id == "StartedTelemetryEvent":
             session.project_id = event["project_id"]
-            session.started_at = created_at
+            session.inited_at = _ms_to_datetime(event["inited_at"])
+            session.created_at = _ms_to_datetime(event["created_at"])
             for plugin in event["plugins"]:
                 sessions[session_id].plugins.append(
                     PluginEntity(plugin["name"], plugin["module"], plugin["enabled"])
@@ -50,6 +50,7 @@ def _group_sessions(events: List[Dict[str, Any]]) -> Dict[UUID, SessionInfoEntit
         elif event_id == "StartupTelemetryEvent":
             session.discovered = event["discovered"]
             session.scheduled = event["scheduled"]
+            session.started_at = _ms_to_datetime(event["created_at"])
 
         elif event_id == "ExcRaisedTelemetryEvent":
             exception = event["exception"]
@@ -59,12 +60,12 @@ def _group_sessions(events: List[Dict[str, Any]]) -> Dict[UUID, SessionInfoEntit
                     message=exception["message"],
                     traceback="".join(exception["traceback"]),
                     scenario_id=event["scenario_id"],
-                    raised_at=created_at,
+                    raised_at=_ms_to_datetime(event["created_at"]),
                 )
             )
 
         elif event_id == "EndedTelemetryEvent":
-            session.ended_at = created_at
+            session.ended_at = _ms_to_datetime(event["created_at"])
             session.total = event["total"]
             session.passed = event["passed"]
             session.failed = event["failed"]

@@ -5,10 +5,12 @@ __all__ = ("AnyEventSchema", "EventListSchema", "StartedTelemetryEvent", "ArgPar
            "ArgParsedTelemetryEvent", "StartupTelemetryEvent", "ExcRaisedTelemetryEvent",
            "EndedTelemetryEvent",)
 
+TimestampSchema = schema.int.min(0)
+
 BaseEvent = schema.dict({
     "event_id": schema.str.len(1, ...),
     "session_id": schema_uuid_str,
-    "created_at": schema.int.min(0),
+    "created_at": TimestampSchema,
 })
 
 PluginSchema = schema.dict({
@@ -21,6 +23,7 @@ StartedTelemetryEvent = BaseEvent + schema.dict({
     "event_id": schema.str("StartedTelemetryEvent"),
     "project_id": schema.str.len(1, ...),
     "plugins": schema.list(PluginSchema),
+    "inited_at": TimestampSchema,
 })
 
 ArgParseTelemetryEvent = BaseEvent + schema.dict({

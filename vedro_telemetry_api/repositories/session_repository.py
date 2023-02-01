@@ -26,6 +26,8 @@ class SessionRepository(Repository):
                 id,
                 project_id,
 
+                inited_at,
+                created_at,
                 started_at,
                 ended_at,
                 saved_at,
@@ -40,7 +42,7 @@ class SessionRepository(Repository):
                 cmd,
                 interrupted
             )
-            VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7, $8, $9, $10, $11, $12)
+            VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         """
         cmd = json.dumps(session.cmd) if session.cmd else None
         interrupted = json.dumps(session.interrupted) if session.interrupted else None
@@ -48,6 +50,8 @@ class SessionRepository(Repository):
             session.id,
             cut_str(session.project_id, 255),
 
+            session.inited_at,
+            session.created_at,
             session.started_at,
             session.ended_at,
 
