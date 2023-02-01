@@ -10,6 +10,7 @@ from ..entities import (
     SessionEntity,
     SessionInfoEntity,
 )
+from ..utils import cut_str
 from .repository import Repository
 
 __all__ = ("SessionRepository",)
@@ -45,7 +46,7 @@ class SessionRepository(Repository):
         interrupted = json.dumps(session.interrupted) if session.interrupted else None
         return query, [
             session.id,
-            session.project_id,
+            cut_str(session.project_id, 255),
 
             session.started_at,
             session.ended_at,
@@ -69,7 +70,11 @@ class SessionRepository(Repository):
         """
         args = []
         for argument in arguments:
-            args.append([session_id, argument.name, json.dumps(argument.value)])
+            args.append([
+                session_id,
+                cut_str(argument.name, 255),
+                json.dumps(argument.value)
+            ])
 
         return query, args
 
@@ -81,7 +86,12 @@ class SessionRepository(Repository):
         """
         args = []
         for plugin in plugins:
-            args.append([session_id, plugin.name, plugin.module, plugin.enabled])
+            args.append([
+                session_id,
+                cut_str(plugin.name, 255),
+                cut_str(plugin.module, 1024),
+                plugin.enabled
+            ])
         return query, args
 
     def _make_exceptions_query(self, session_id: UUID,
@@ -103,9 +113,9 @@ class SessionRepository(Repository):
         for exception in exceptions:
             args.append([
                 session_id,
-                exception.scenario_id,
+                cut_str(exception.scenario_id, 1024),
 
-                exception.type,
+                cut_str(exception.type, 255),
                 exception.message,
                 exception.traceback,
 
@@ -120,11 +130,14 @@ class SessionRepository(Repository):
             session_query, session_args = self._make_session_query(session_info.session)
             await conn.execute(session_query, *session_args)
 
-            args_query, args_args = self._make_arguments_query(session_id, session_info.arguments)
+            args_query, args_args = \
+                self._make_arguments_query(session_id, session_info.arguments)
             await conn.executemany(args_query, args_args)
 
-            plugins_query, plugins_args = self._make_plugins_query(session_id, session_info.plugins)
+            plugins_query, plugins_args = \
+                self._make_plugins_query(session_id, session_info.plugins)
             await conn.executemany(plugins_query, plugins_args)
 
-            exceptions_query, exceptions_args = self._make_exceptions_query(session_id, session_info.exceptions)
+            exceptions_query, exceptions_args = \
+                self._make_exceptions_query(session_id, session_info.exceptions)
             await conn.executemany(exceptions_query, exceptions_args)
