@@ -3,9 +3,9 @@ from http import HTTPStatus
 from aiohttp.web import Request, Response, json_response
 from aiohttp_valera_validator import validate
 
-from ._group_sessions import _group_sessions
 from ..repositories import SessionRepository
 from ..schemas import EventListSchema
+from ._group_sessions import _group_sessions
 
 __all__ = ("post_events",)
 

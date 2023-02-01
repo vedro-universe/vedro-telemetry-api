@@ -69,7 +69,12 @@ def _group_sessions(events: List[Dict[str, Any]]) -> Dict[UUID, SessionInfoEntit
             session.passed = event["passed"]
             session.failed = event["failed"]
             session.skipped = event["skipped"]
-            session.interrupted = event["interrupted"]
+            if event["interrupted"]:
+                session.interrupted = {
+                    "type": event["interrupted"]["type"],
+                    "message": event["interrupted"]["message"],
+                    "traceback": "".join(event["interrupted"]["traceback"]),
+                }
 
         else:
             raise ValueError(f"Unknown event_id: {event_id}")
