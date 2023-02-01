@@ -43,12 +43,14 @@ class SessionRepository(Repository):
                 skipped,
 
                 cmd,
+                environment,
                 interrupted
             )
-            VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9, $10, $11, $12, $13, $14)
+            VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9, $10, $11, $12, $13, $14, $15)
         """
         cmd = json.dumps(session.cmd) if session.cmd else None
         interrupted = json.dumps(session.interrupted) if session.interrupted else None
+        environment = json.dumps(session.environment) if session.environment else None
         return query, [
             session.id,
             cut_str(session.project_id, 255),
@@ -66,6 +68,7 @@ class SessionRepository(Repository):
             session.skipped,
 
             cmd,
+            environment,
             interrupted,
         ]
 

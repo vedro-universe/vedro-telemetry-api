@@ -12,6 +12,10 @@ class InterruptedException(TypedDict):
     traceback: str
 
 
+class Environment(TypedDict):
+    python_version: str
+    vedro_version: str
+
 _utc_zero = datetime.utcfromtimestamp(0)
 
 
@@ -24,7 +28,6 @@ class SessionEntity:
     started_at: Optional[datetime] = None
     ended_at: Optional[datetime] = None
     project_id: str = ""
-    cmd: Optional[List[str]] = None
 
     discovered: Optional[int] = None
     scheduled: Optional[int] = None
@@ -33,4 +36,6 @@ class SessionEntity:
     failed: Optional[int] = None
     skipped: Optional[int] = None
 
+    cmd: Optional[List[str]] = None
+    environment: Optional[Environment] = None
     interrupted: Optional[InterruptedException] = None

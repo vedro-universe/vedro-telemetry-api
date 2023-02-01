@@ -17,6 +17,7 @@ CREATE TABLE sessions (
     "skipped" integer,
 
     "cmd" jsonb,
+    "environment" jsonb,
     "interrupted" jsonb,
 
     PRIMARY KEY ("id")

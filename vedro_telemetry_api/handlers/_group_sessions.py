@@ -33,6 +33,7 @@ def _group_sessions(events: List[Dict[str, Any]]) -> Dict[UUID, SessionInfoEntit
             session.project_id = event["project_id"]
             session.inited_at = _ms_to_datetime(event["inited_at"])
             session.created_at = _ms_to_datetime(event["created_at"])
+            session.environment = event["environment"]
             for plugin in event["plugins"]:
                 sessions[session_id].plugins.append(
                     PluginEntity(

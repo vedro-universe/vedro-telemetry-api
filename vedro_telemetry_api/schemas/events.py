@@ -20,9 +20,15 @@ PluginSchema = schema.dict({
     "version": schema.str.len(1, ...),
 })
 
+EnvironmentSchema = schema.dict({
+    "python_version": schema.str.len(1, ...),
+    "vedro_version": schema.str.len(1, ...),
+})
+
 StartedTelemetryEvent = BaseEvent + schema.dict({
     "event_id": schema.str("StartedTelemetryEvent"),
     "project_id": schema.str.len(1, ...),
+    "environment": EnvironmentSchema,
     "plugins": schema.list(PluginSchema),
     "inited_at": TimestampSchema,
 })
