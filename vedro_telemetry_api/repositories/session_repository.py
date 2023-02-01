@@ -1,5 +1,5 @@
 import json
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, TypeVar
 from uuid import UUID
 
 from ..clients import PgsqlClient
@@ -15,12 +15,15 @@ from .repository import Repository
 
 __all__ = ("SessionRepository",)
 
+_T = TypeVar("_T")
+QueryType = Tuple[str, List[_T]]
+
 
 class SessionRepository(Repository):
     def __init__(self, pgsql_client: PgsqlClient) -> None:
         self._pgsql_client = pgsql_client
 
-    def _make_session_query(self, session: SessionEntity) -> Tuple[str, List[Any]]:
+    def _make_session_query(self, session: SessionEntity) -> QueryType[Any]:
         query = """
             INSERT INTO sessions (
                 id,
@@ -67,7 +70,7 @@ class SessionRepository(Repository):
         ]
 
     def _make_arguments_query(self, session_id: UUID,
-                              arguments: List[ArgumentEntity]) -> Tuple[str, List[List[Any]]]:
+                              arguments: List[ArgumentEntity]) -> QueryType[List[Any]]:
         query = """
             INSERT INTO arguments (session_id, name, value)
             VALUES ($1, $2, $3)
@@ -83,7 +86,7 @@ class SessionRepository(Repository):
         return query, args
 
     def _make_plugins_query(self, session_id: UUID,
-                            plugins: List[PluginEntity]) -> Tuple[str, List[List[Any]]]:
+                            plugins: List[PluginEntity]) -> QueryType[List[Any]]:
         query = """
             INSERT INTO plugins (session_id, name, module, enabled)
              VALUES ($1, $2, $3, $4)
@@ -99,7 +102,7 @@ class SessionRepository(Repository):
         return query, args
 
     def _make_exceptions_query(self, session_id: UUID,
-                               exceptions: List[ExceptionEntity]) -> Tuple[str, List[List[Any]]]:
+                               exceptions: List[ExceptionEntity]) -> QueryType[List[Any]]:
         query = """
             INSERT INTO exceptions (
                 session_id,
