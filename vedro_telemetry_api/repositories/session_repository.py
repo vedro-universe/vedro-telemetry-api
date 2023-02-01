@@ -4,7 +4,7 @@ from uuid import UUID
 
 from .repository import Repository
 from ..clients import PgsqlClient
-from ..entities import SessionEntity, SessionInfoEntity, ArgumentEntity
+from ..entities import SessionEntity, SessionInfoEntity, ArgumentEntity, PluginEntity
 
 __all__ = ("SessionRepository",)
 
@@ -67,6 +67,17 @@ class SessionRepository(Repository):
 
         return query, args
 
+    def _make_plugins_query(self, session_id: UUID,
+                            plugins: List[PluginEntity]) -> Tuple[str, List[List[Any]]]:
+        query = """
+            INSERT INTO plugins (session_id, name, module, enabled)
+             VALUES ($1, $2, $3, $4)
+        """
+        args = []
+        for plugin in plugins:
+            args.append([session_id, plugin.name, plugin.module, plugin.enabled])
+        return query, args
+
     async def save_session(self, session_info: SessionInfoEntity) -> None:
         async with self._pgsql_client.transaction() as conn:
             session_id = session_info.session.id
@@ -76,3 +87,6 @@ class SessionRepository(Repository):
 
             args_query, args_args = self._make_arguments_query(session_id, session_info.arguments)
             await conn.executemany(args_query, args_args)
+
+            plugins_query, plugins_args = self._make_plugins_query(session_id, session_info.plugins)
+            await conn.executemany(plugins_query, plugins_args)
