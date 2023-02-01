@@ -45,7 +45,7 @@ class SessionRepository(Repository):
                 cmd,
                 interrupted
             )
-            VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9, $10, $11, $12, $13, $14)
         """
         cmd = json.dumps(session.cmd) if session.cmd else None
         interrupted = json.dumps(session.interrupted) if session.interrupted else None
