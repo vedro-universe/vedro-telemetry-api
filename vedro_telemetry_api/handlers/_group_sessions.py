@@ -42,9 +42,9 @@ def _group_sessions(events: List[Dict[str, Any]]) -> Dict[UUID, SessionInfoEntit
             session.cmd = event["cmd"]
 
         elif event_id == "ArgParsedTelemetryEvent":
-            for key, val in event["args"].items():
+            for name, value in event["args"].items():
                 sessions[session_id].arguments.append(
-                    ArgumentEntity(key, val)
+                    ArgumentEntity(name, value)
                 )
 
         elif event_id == "StartupTelemetryEvent":

@@ -6,5 +6,5 @@ __all__ = ("ArgumentEntity", )
 
 @dataclass
 class ArgumentEntity:
-    key: str
+    name: str
     value: Any
