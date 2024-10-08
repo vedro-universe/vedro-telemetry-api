@@ -1,9 +1,7 @@
-version: "3.9"
-
 services:
   app:
     image: vedrouniverse/vedro-telemetry-api:0.1.0
-    build: .
+    restart: unless-stopped
     environment:
       - TZ=UTC
       - DB_DSN=postgresql://vedro_telemetry:vedro_telemetry@db:5432/vedro_telemetry
@@ -12,7 +10,7 @@ services:
     volumes:
       - migrations:/app/migrations
     healthcheck:
-      test: "wget -q -O - http://localhost/healthcheck"
+      test: "wget -q -O - http://127.0.0.1:80/healthcheck"
       interval: 3s
       timeout: 5s
       retries: 10
@@ -21,14 +19,15 @@ services:
         condition: service_healthy
 
   db:
-    image: postgres:15.1-alpine
+    image: postgres:15.8-alpine
+    restart: unless-stopped
     environment:
       - TZ=UTC
       - POSTGRES_USER=vedro_telemetry
       - POSTGRES_PASSWORD=vedro_telemetry
       - POSTGRES_DB=vedro_telemetry
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
     ports:
       - "6432:5432"
     healthcheck:
@@ -51,11 +50,14 @@ services:
         condition: service_healthy
 
   grafana:
-    image: grafana/grafana:10.3.4
+    image: grafana/grafana:11.2.2
+    restart: unless-stopped
     ports:
       - "3000:3000"
     volumes:
       - ./grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
 
 volumes:
   migrations:

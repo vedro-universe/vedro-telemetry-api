@@ -1,0 +1,13 @@
+apiVersion: 1
+
+datasources:
+  - name: PostgreSQL
+    type: postgres
+    url: "db:5432"
+    user: "vedro_telemetry"
+    secureJsonData:
+      password: "vedro_telemetry"
+    jsonData:
+      database: "vedro_telemetry"
+      sslmode: "disable"
+      postgresVersion: 15
