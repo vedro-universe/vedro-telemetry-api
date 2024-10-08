@@ -20,10 +20,31 @@ QueryType = Tuple[str, List[_T]]
 
 
 class SessionRepository(Repository):
+    """
+    Repository for handling the persistence of session-related data.
+
+    This class provides methods to save session data, arguments, plugins,
+    and exceptions into a PostgreSQL database using a PgsqlClient.
+    """
+
     def __init__(self, pgsql_client: PgsqlClient) -> None:
+        """
+        Initialize the repository with a PostgreSQL client.
+
+        :param pgsql_client: The PostgreSQL client used to execute database queries.
+        """
         self._pgsql_client = pgsql_client
 
     def _make_session_query(self, session: SessionEntity) -> QueryType[Any]:
+        """
+        Create a query and its arguments to insert a session into the database.
+
+        This method prepares an SQL query for inserting session data into the
+        'sessions' table.
+
+        :param session: The session entity containing the session data to be saved.
+        :return: A tuple containing the SQL query and the corresponding arguments.
+        """
         query = """
             INSERT INTO sessions (
                 id,
@@ -74,6 +95,16 @@ class SessionRepository(Repository):
 
     def _make_arguments_query(self, session_id: UUID,
                               arguments: List[ArgumentEntity]) -> QueryType[List[Any]]:
+        """
+        Create a query and its arguments to insert session arguments into the database.
+
+        This method prepares an SQL query for inserting command-line arguments
+        into the 'arguments' table.
+
+        :param session_id: The UUID of the session associated with the arguments.
+        :param arguments: A list of argument entities to be saved.
+        :return: A tuple containing the SQL query and the corresponding arguments.
+        """
         query = """
             INSERT INTO arguments (session_id, name, value)
             VALUES ($1, $2, $3)
@@ -90,6 +121,16 @@ class SessionRepository(Repository):
 
     def _make_plugins_query(self, session_id: UUID,
                             plugins: List[PluginEntity]) -> QueryType[List[Any]]:
+        """
+        Create a query and its arguments to insert plugins into the database.
+
+        This method prepares an SQL query for inserting plugin data
+        into the 'plugins' table.
+
+        :param session_id: The UUID of the session associated with the plugins.
+        :param plugins: A list of plugin entities to be saved.
+        :return: A tuple containing the SQL query and the corresponding arguments.
+        """
         query = """
             INSERT INTO plugins (session_id, name, module, enabled, version)
              VALUES ($1, $2, $3, $4, $5)
@@ -107,6 +148,16 @@ class SessionRepository(Repository):
 
     def _make_exceptions_query(self, session_id: UUID,
                                exceptions: List[ExceptionEntity]) -> QueryType[List[Any]]:
+        """
+        Create a query and its arguments to insert exceptions into the database.
+
+        This method prepares an SQL query for inserting exception data
+        into the 'exceptions' table.
+
+        :param session_id: The UUID of the session associated with the exceptions.
+        :param exceptions: A list of exception entities to be saved.
+        :return: A tuple containing the SQL query and the corresponding arguments.
+        """
         query = """
             INSERT INTO exceptions (
                 session_id,
@@ -135,6 +186,15 @@ class SessionRepository(Repository):
         return query, args
 
     async def save_session(self, session_info: SessionInfoEntity) -> None:
+        """
+        Save the session information and associated data to the database.
+
+        This method saves the session, along with its arguments, plugins,
+        and exceptions, in a transaction to ensure atomicity.
+
+        :param session_info: The session information entity containing session data,
+                             arguments, plugins, and exceptions to be saved.
+        """
         async with self._pgsql_client.transaction() as conn:
             session_id = session_info.session.id
 

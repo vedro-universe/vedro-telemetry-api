@@ -7,4 +7,4 @@ from .config import Config
 
 if __name__ == "__main__":
     app = asyncio.run(create_app())
-    web.run_app(app, host=Config.App.HOST, port=Config.App.PORT)
+    web.run_app(app, host=Config.App.HOST, port=Config.App.PORT, print=None)

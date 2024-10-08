@@ -3,7 +3,7 @@ from http import HTTPStatus
 from aiohttp.web import Request, Response, json_response
 from aiohttp_valera_validator import validate
 
-from ..repositories import SessionRepository
+from ..app_keys import session_repo_key
 from ..schemas import EventListSchema
 from ._group_sessions import _group_sessions
 
@@ -12,7 +12,19 @@ __all__ = ("post_events",)
 
 @validate(json=EventListSchema)
 async def post_events(request: Request) -> Response:
-    session_repo: SessionRepository = request.app["session_repo"]
+    """
+    Handle the POST request to save telemetry events.
+
+    This asynchronous function processes telemetry events received in the request body,
+    groups them by session, and saves them to the session repository. It returns a JSON
+    response with the list of saved session IDs, or an error message if the operation
+    fails.
+
+    :param request: The HTTP request containing telemetry event data in JSON format.
+    :return: A JSON response with the saved session IDs and an HTTP 200 OK status, or
+             an error message with an HTTP 500 Internal Server Error status.
+    """
+    session_repo = request.app[session_repo_key]
 
     payload = await request.json()
 

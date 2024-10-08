@@ -14,10 +14,28 @@ __all__ = ("_group_sessions",)
 
 
 def _ms_to_datetime(ms: int) -> datetime:
+    """
+    Convert milliseconds since epoch to a UTC datetime object.
+
+    :param ms: The timestamp in milliseconds.
+    :return: A `datetime` object representing the given timestamp.
+    """
     return datetime.utcfromtimestamp(ms / 1000.0)
 
 
 def _group_sessions(events: List[Dict[str, Any]]) -> Dict[UUID, SessionInfoEntity]:
+    """
+    Group events by session and construct `SessionInfoEntity` objects.
+
+    This function processes a list of telemetry events, grouping them by session.
+    It initializes or updates session-related data based on the event type, and
+    returns a dictionary mapping session UUIDs to `SessionInfoEntity` instances.
+
+    :param events: A list of event dictionaries containing telemetry data.
+    :return: A dictionary where the keys are session UUIDs and the values are
+             `SessionInfoEntity` instances populated with event data.
+    :raises ValueError: If an unknown `event_id` is encountered.
+    """
     sessions = {}
 
     for event in events:
