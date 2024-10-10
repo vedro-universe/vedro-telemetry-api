@@ -3,11 +3,19 @@ apiVersion: 1
 datasources:
   - name: PostgreSQL
     type: postgres
+    access: proxy
+    isDefault: true
     url: "db:5432"
     user: "vedro_telemetry"
-    secureJsonData:
-      password: "vedro_telemetry"
     jsonData:
       database: "vedro_telemetry"
       sslmode: "disable"
       postgresVersion: 15
+    secureJsonData:
+      password: "vedro_telemetry"
+    editable: true
+  - name: JSON API
+    type: marcusolsson-json-datasource
+    access: proxy
+    isDefault: false
+    url: "https://api.vedro.io/v1/latest-version"
