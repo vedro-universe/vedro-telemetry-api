@@ -12,4 +12,4 @@ async def healthcheck(request: Request) -> Response:
     :param request: The HTTP request object (unused).
     :return: A JSON response with an HTTP 200 OK status.
     """
-    return json_response({}, status=HTTPStatus.OK)
+    return json_response({"status": "OK"}, status=HTTPStatus.OK)
