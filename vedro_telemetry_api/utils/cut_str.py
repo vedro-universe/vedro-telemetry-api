@@ -20,7 +20,7 @@ def cut_str(string: str, length: int, separator: str = "..") -> str:
                         The message will indicate that the length must exceed the separator length.
     """
     if length <= len(separator):
-        raise ValueError(f"Length must be greater than the length of the separator")
+        raise ValueError("Length must be greater than the length of the separator")
 
     if len(string) <= length:
         return string
