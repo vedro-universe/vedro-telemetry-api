@@ -27,6 +27,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "PCC52D03280B7034C"
       },
+      "description": "A list of projects with Python and Vedro versions.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -106,7 +107,7 @@
           }
         }
       ],
-      "title": "Projects",
+      "title": "Project Overview",
       "type": "table"
     },
     {
@@ -115,6 +116,7 @@
         "type": "marcusolsson-json-datasource",
         "uid": "PD5070BC1AA9F8304"
       },
+      "description": "A table showing the latest Vedro version available on PyPi.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -174,7 +176,7 @@
           "fields": [
             {
               "jsonPath": "$.version",
-              "name": "Last Version",
+              "name": "Latest Version",
               "type": "string"
             }
           ],
@@ -185,6 +187,372 @@
         }
       ],
       "title": "Vedro",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "description": "A list of projects with the count of total scenarios.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.2.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PCC52D03280B7034C"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT project_id, discovered\nFROM (\n    SELECT\n        DISTINCT ON (project_id)\n        project_id,\n        discovered\n    FROM sessions\n    WHERE discovered is not NULL\n        AND saved_at BETWEEN $__timeFrom() AND $__timeTo()\n        AND project_id != 'unknown'\n    ORDER BY project_id ASC, discovered DESC\n) as t\nORDER BY discovered DESC, project_id ASC\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Scenario Count",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "description": "A list of projects with the median and average time to the first significant line of the test.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.2.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PCC52D03280B7034C"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "select\n    project_id,\n    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY elapsed) AS median,\n    ROUND(AVG(elapsed), 2) as avg\nfrom (\n    SELECT\n        project_id,\n        EXTRACT(epoch FROM started_at) - EXTRACT(epoch FROM inited_at) as elapsed\n    FROM sessions\n    WHERE started_at is not NULL\n        AND project_id != 'unknown'\n        AND saved_at BETWEEN $__timeFrom() AND $__timeTo()\n) as t\nGROUP BY project_id\nORDER BY avg DESC, project_id ASC\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Startup Time",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "description": "Displays the plugins used across different projects and the number of projects using each plugin.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 5,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.2.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PCC52D03280B7034C"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT name, count(*) as projects\nFROM (\n    SELECT\n        s.project_id as project_id,\n        p.name as name\n    FROM sessions as s\n    JOIN plugins as p\n        ON p.session_id = s.id\n    WHERE p.enabled IS TRUE\n        AND saved_at BETWEEN $__timeFrom() AND $__timeTo()\n        AND s.project_id != 'unknown'\n    GROUP by s.project_id, p.name\n) as t\nGROUP by name\nORDER BY projects DESC, name ASC\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Plugin Usage",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "description": "A list of projects with all enabled plugins (including their versions).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.2.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PCC52D03280B7034C"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \n    stp.project_id, \n    p.name, \n    p.version \nFROM (\n    SELECT\n        DISTINCT ON (project_id) \n        project_id, \n        FIRST_VALUE(id) OVER (PARTITION BY project_id ORDER BY saved_at DESC) AS session_id                 \n    FROM \n        sessions                 \n    WHERE \n        environment->>'vedro_version' IS NOT NULL              \n        AND project_id != 'unknown'                \n        AND discovered IS NOT NULL\n      \n) AS stp\nLEFT JOIN \n    plugins AS p\n    ON stp.session_id = p.session_id\nWHERE \n    p.enabled = TRUE\nORDER BY \n    stp.project_id, \n    p.name",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Plugin Adoption",
+      "transformations": [
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "name",
+            "rowField": "project_id",
+            "valueField": "version"
+          }
+        }
+      ],
       "type": "table"
     }
   ],
@@ -201,6 +569,6 @@
   "timezone": "browser",
   "title": "Dashboard",
   "uid": "ee090czpq6i9sf",
-  "version": 2,
+  "version": 4,
   "weekStart": ""
 }
