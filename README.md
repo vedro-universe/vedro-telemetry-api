@@ -1,9 +1,7 @@
 # Vedro Telemetry API
 
-Vedro API for self-hosted telemetry
+A self-hosted telemetry server for collecting and visualizing telemetry data from Vedro test runs.
 
-## Installation
+## Documentation
 
-```shell
-$ docker-compose up -d
-```
+For setup instructions and more details, please refer to the [Vedro Telemetry Server Documentation](https://vedro.io/docs/solutions/setting-up-self-hosted-telemetry-server).
